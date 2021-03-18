@@ -26,8 +26,8 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
+          draft: true
+          prerelease: true
   build:
     name: Build ${{ matrix.os }}
     needs: create_release
@@ -51,14 +51,16 @@ jobs:
           CIBW_ENVIRONMENT: "version=${{ github.ref }}"
         run: |
           python -m cibuildwheel --output-dir wheelhouse
-      - name: Upload Release Assets
-        id: upload-release-assets
-        uses: dwenegar/upload-release-assets@v1
+      - name: Upload Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          release_id: ${{ needs.create_release.create_release_id.outputs.id }}
-          assets_path: ./wheelhouse/
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: ./wheelhouse/
+          asset_name: wheel-${{ matrix.os }}
+          asset_content_type: application/octet-stream
       # - name: Run Unit Test
       #   if: ${{ contains(github.ref, 't') }}
       # - name: Generate Documentation

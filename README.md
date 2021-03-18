@@ -60,7 +60,7 @@ pip install pydockrmsd # pypi source
 - [crystal_bench.ipynb](https://github.com/neudinger/pyDockRMSD/blob/main/examples/crystal_bench.ipynb)
 [DockRMSD Website](https://zhanglab.ccmb.med.umich.edu/DockRMSD/) python Wrapper: docking pose distance calculation
 
-Python atom mapping and RMSD calculation of symmetric molecules through graph isomorphism. ___Journal of Cheminformatics___, 11:40 (2019).
+Python atom mapping and RMSD calculation of symmetric molecules through [graph](https://en.wikipedia.org/wiki/Graph_isomorphism) [isomorphism](https://en.wikipedia.org/wiki/Isomorphism). ___Journal of Cheminformatics___, 11:40 (2019).
 
 PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 

@@ -1,0 +1,13 @@
+# Copyright (c) 2020 Aqemia - All rights reserved.
+channels:
+  - defaults
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.8
+  - rdkit=2020.09.4
+  - pandas  
+  - pip
+  - pip:
+      - pyarrow
+      - table

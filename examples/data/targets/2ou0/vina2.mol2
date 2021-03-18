@@ -1,0 +1,20 @@
+@<TRIPOS>MOLECULE
+/tmp/ewbell/vina_2ou0_2ou0_lig/vina/vina2.pdbqt
+ 6 6 0 0 0
+SMALL
+GASTEIGER
+
+@<TRIPOS>ATOM
+      1  C1       -21.2480   26.3400   -2.7200 C.ar  165  INH165      0.0190
+      2  C2       -21.9440   25.2000   -2.7300 C.ar  165  INH165      0.0190
+      3  C3       -21.4810   26.9730   -3.8700 C.ar  165  INH165      0.0900
+      4  C4       -22.6170   25.1100   -3.8810 C.ar  165  INH165      0.0900
+      5  C5       -22.8430   26.5390   -5.9110 C.3   165  INH165      0.1540
+      6  N1       -22.3210   26.2130   -4.5650 N.ar  165  INH165     -0.3710
+@<TRIPOS>BOND
+     1     5     6    1
+     2     6     4   ar
+     3     6     3   ar
+     4     4     2   ar
+     5     3     1   ar
+     6     2     1   ar

@@ -1,0 +1,25 @@
+Contents of this directory:
+
++DockRMSD.c: the C source code for DockRMSD
++hungarian.py: the python source code for our Hungarian algorithm implementation
++N.txt: RMSD values for all 3,430 pose pairs using neighbor depth N
++compare/
+    +qualvhung: DockRMSD values compared with the Hungarian algorithm's values for all 3,430 pose pairs
+    +tradvqual: Naive values compared with DockRMSD values for all 3,430 pose pairs
+    +crystal.txt: DockRMSD values compared with the Hungarian algorithm's values for all 343 docking pose-crystal pose pairs
++runtime/
+    +C60/
+        +vinaN.mol2: the Nth top pose from AutoDock Vina of C60
+	+runtimes.txt: The runtime (in seconds) of RMSD calculation of each possible pose pair
+	+receptor.pdbqt: The receptor protein structure in pdbqt format
+    +efficiency.txt: Runtimes for each of the 3,430 pose pairs using DockRMSD, as well as # of possible mappings
+    +obrmsefficiency.txt: Runtimes for each of the 3,430 pose pairs using obrms
+    +tradefficiency.txt: Runtimes for each of the 3,430 pose pairs using direct correspondence
+    +totalwalltime.txt: Total runtimes for each of the algorithms on all 3,430 pose pairs at once
++targets/
+    +protlist: a line delimited list of all targets of the CSAR Hi-Q set
+    +target directory (e.g. 1ec0/)
+        +vinaN.mol2: the Nth top pose from AutoDock Vina in mol2 format
+	+crystal.mol2: The crystal structure pose from the CSAR Hi-Q set
+	+target.pdb: A pdb structure of the receptor protein
+	+oldvina1.mol2: if this file exists, vina1.mol2 had a bonding error relative to the crystal structure, which has been corrected in vina1.mol2.  This file is vina1.mol2 before the correction.

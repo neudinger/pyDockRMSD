@@ -27,14 +27,14 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
   build:
     name: Build ${{ matrix.os }}
     needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         os: [ubuntu-20.04, macOS-10.15]
     if: contains(github.ref, 'v')
@@ -67,11 +67,10 @@ jobs:
       #   run: |
       #     pip install pdoc3
       - name: Deploy to PyPI
-        if: ${{ contains(github.ref, 'p') && matrix.os == 'ubuntu-20.04' }}
+        if: contains(github.ref, 'p')
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
-          set -eux ; ls -la ./wheelhouse/
-        # python -m pip install twine
-        # twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/*.whl
+          python -m pip install twine
+          twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/*.whl

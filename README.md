@@ -56,7 +56,7 @@ pip install pydockrmsd # pypi source
 ## Example
 
 - [crystal_bench.py](https://github.com/neudinger/pyDockRMSD/blob/main/examples/crystal_bench.py)
-  - `rdkit, pandas` required
+  - `rdkit, pandas, pyarrow` required
 - [crystal_bench.ipynb](https://github.com/neudinger/pyDockRMSD/blob/main/examples/crystal_bench.ipynb)
 [DockRMSD Website](https://zhanglab.ccmb.med.umich.edu/DockRMSD/) python Wrapper: docking pose distance calculation
 
@@ -68,16 +68,18 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 
 - Linux
 - Mac OS
-- Window (soon)
 
 Tools used:
 
 - cython
-- pdoc3
-- pandoc
-- cibuildwheel (cross compilation)
+- [pdoc3](https://pdoc3.github.io/pdoc/)
+- [pandoc](https://pandoc.org/)
+- pyarrow (file.parquet as file storage system)
+- [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/) (cross compilation)
 
 ## Documentation
+
+### Local documentation
 
 ```bash
 pdoc3 pydockrmsd --http localhost:8080

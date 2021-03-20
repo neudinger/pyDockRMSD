@@ -1,15 +1,23 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
+// #include <string.h>
+// #include <ctype.h>
+// #include <math.h>
 #ifdef __unix__
 #include <alloca.h>
+#define malloca alloca
+//linux code goes here
+#elif _WIN32
+#include <windows.h>
+#define malloca _alloca
+// windows code goes here
 #endif
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <math.h>
+
 #include <float.h>
+#include <stdio.h>   /* needed for vsnprintf */
+#include <stdlib.h>  /* needed for malloc-free */
+#include <stdarg.h>  /* needed for va_list */
 #define HFLAG 0      // Remove Hydrogenes
 #define SIMPLEFLAG 0 // Less is more
 /*
@@ -29,6 +37,48 @@
  # isomorphism. Journal of Cheminformatics, 11:40 (2019).             #
  ######################################################################
 */
+
+#ifndef _vscprintf
+/* For some reason, MSVC fails to honour this #ifndef. */
+/* Hence function renamed to _vscprintf_so(). */
+int _vscprintf_so(const char *format, va_list pargs)
+{
+    int retval;
+    va_list argcopy;
+    va_copy(argcopy, pargs);
+    retval = vsnprintf(NULL, 0, format, argcopy);
+    va_end(argcopy);
+    return retval;
+}
+#endif // _vscprintf
+
+#ifndef vasprintf
+int vasprintf(char **strp, const char *fmt, va_list ap)
+{
+    int len = _vscprintf_so(fmt, ap);
+    if (len == -1)
+        return -1;
+    char *str = malloc((size_t)len + 1);
+    if (!str)
+        return -1;
+    int r = vsnprintf(str, len + 1, fmt, ap); /* "secure" version of vsprintf */
+    if (r == -1)
+        return free(str), -1;
+    *strp = str;
+    return r;
+}
+#endif // vasprintf
+
+#ifndef asprintf
+int asprintf(char *strp[], const char *fmt, ...)
+{
+    va_list ap;
+    va_start(ap, fmt);
+    int r = vasprintf(strp, fmt, ap);
+    va_end(ap);
+    return r;
+}
+#endif // asprintf
 
 #define MAXBONDS 6        //Maximum number of bonds allowable on a single atom
 #define MAXLINELENGTH 150 //Maximum length (in characters) of a line in a mol2 file
@@ -76,32 +126,32 @@ struct DockRMSD dock_rmsd(FILE *query, FILE *template)
     }
     //Initialize pointer arrays and fill them with information from the mol2 files
     int i, j;
-    char **queryatoms = (char **)alloca(sizeof(char *) * querycount);
-    double **querycoords = (double **)alloca(sizeof(double *) * querycount);
-    char ***querybonds = (char ***)alloca(sizeof(char **) * querycount);
-    char **tempatoms = (char **)alloca(sizeof(char *) * tempcount);
-    double **tempcoords = (double **)alloca(sizeof(double *) * tempcount);
-    char ***tempbonds = (char ***)alloca(sizeof(char **) * tempcount);
-    int *querynums = (int *)alloca(sizeof(int) * querycount);
-    int *tempnums = (int *)alloca(sizeof(int) * tempcount);
+    char **queryatoms = (char **)malloca(querycount * sizeof(char *));
+    double **querycoords = (double **)malloca(querycount * sizeof(double *));
+    char ***querybonds = (char ***)malloca(querycount * sizeof(char **));
+    char **tempatoms = (char **)malloca(tempcount * sizeof(char *));
+    double **tempcoords = (double **)malloca(tempcount * sizeof(double *));
+    char ***tempbonds = (char ***)malloca(tempcount * sizeof(char **));
+    int *querynums = (int *)malloca(querycount * sizeof(int));
+    int *tempnums = (int *)malloca(tempcount * sizeof(int));
     for (i = 0; i < querycount; i++)
     {
-        char *queryatom = (char *)alloca(sizeof(char) * 3);
+        char *queryatom = (char *)malloca(3 * sizeof(char));
         *(queryatoms + i) = queryatom;
-        char *tempatom = (char *)alloca(sizeof(char) * 3);
+        char *tempatom = (char *)malloca(3 * sizeof(char));
         *(tempatoms + i) = tempatom;
-        double *querycoord = (double *)alloca(sizeof(double) * 3);
+        double *querycoord = (double *)malloca(3 * sizeof(double));
         *(querycoords + i) = querycoord;
-        double *tempcoord = (double *)alloca(sizeof(double) * 3);
+        double *tempcoord = (double *)malloca(3 * sizeof(double));
         *(tempcoords + i) = tempcoord;
-        char **querybondrow = (char **)alloca(sizeof(char *) * querycount);
-        char **tempbondrow = (char **)alloca(sizeof(char *) * tempcount);
+        char **querybondrow = (char **)malloca(querycount * sizeof(char *));
+        char **tempbondrow = (char **)malloca(tempcount * sizeof(char *));
         for (j = 0; j < querycount; j++)
         {
-            char *querybond = (char *)alloca(sizeof(char) * 3);
+            char *querybond = (char *)malloca(3 * sizeof(char));
             strcpy(querybond, "");
             *(querybondrow + j) = querybond;
-            char *tempbond = (char *)alloca(sizeof(char) * 3);
+            char *tempbond = (char *)malloca(3 * sizeof(char));
             strcpy(tempbond, "");
             *(tempbondrow + j) = tempbond;
         }
@@ -154,8 +204,8 @@ int strcompar(const void *a, const void *b) { return strcmp(*(char **)a, *(char 
 int arrayIdentity(char **arr1, char **arr2, int arrlen)
 {
     int i;
-    char **list1 = (char **)alloca(sizeof(char *) * arrlen);
-    char **list2 = (char **)alloca(sizeof(char *) * arrlen);
+    char **list1 = (char **)malloca(sizeof(char *) * arrlen);
+    char **list2 = (char **)malloca(sizeof(char *) * arrlen);
     for (i = 0; i < arrlen; i++)
     {
         list1[i] = *(arr1 + i);
@@ -238,7 +288,7 @@ void readMol2(char **atoms, double **coords, char ***bonds, int *nums, FILE *mol
     int i = 0;
     int sectionflag = 0; //Value is 1 when reading atoms, 2 when reading bonds, 0 before atoms, >2 after bonds
     char line[MAXLINELENGTH];
-    int *atomnums = (int *)alloca(sizeof(int) * atomcount);
+    int *atomnums = (int *)malloca(sizeof(int) * atomcount);
     // int atomnums[atomcount]; //Keeps track of all non-H atom numbers for bond reading
     while (fgets(line, MAXLINELENGTH, mol2) != NULL)
     {
@@ -354,7 +404,7 @@ char **buildTree(int depth, int index,
         int maxleaves = (int)pow((double)MAXBONDS, (double)depth); //Maximum possible number of leaf nodes at this depth
         char **outlist = (char **)malloc(sizeof(char *) * (maxleaves + 1));
         if (!outlist)
-        { //If the outlist pointer wasn't allocated, you've hit the recursion limit
+        { //If the outlist pointer wasn't mallocated, you've hit the recursion limit
             return NULL;
         }
         *outlist = NULL;
@@ -364,7 +414,7 @@ char **buildTree(int depth, int index,
             if (bondinds[i] != prevind)
             { //Don't analyze the atom we just came from in the parent function call
                 // char newpre[strlen(prestring) + 8];
-                char *newpre = (char *)alloca(strlen(prestring) + 8);
+                char *newpre = (char *)malloca(strlen(prestring) + 8);
                 strcpy(newpre, prestring);
                 strcat(newpre, bondtypes[i]);
                 strcat(newpre, *(atoms + bondinds[i]));
@@ -402,10 +452,10 @@ double searchAssigns(int atomcount, int **allcands,
     int j;
     int index;
     double **dists = (double **)malloc(sizeof(double *) * atomcount); //Distances between query atoms and template atoms
-    double *querydists = (double *)alloca(sizeof(double) * atomcount * atomcount);
-    int **queryconnect = (int **)alloca(sizeof(int *) * atomcount * MAXBONDS);
-    int *bondcount = (int *)alloca(sizeof(int) * atomcount);
-    int *connectcount = (int *)alloca(sizeof(int) * atomcount);
+    double *querydists = (double *)malloca(sizeof(double) * atomcount * atomcount);
+    int **queryconnect = (int **)malloca(sizeof(int *) * atomcount * MAXBONDS);
+    int *bondcount = (int *)malloca(sizeof(int) * atomcount);
+    int *connectcount = (int *)malloca(sizeof(int) * atomcount);
 
     //precalculate all query-template atomic distances
     for (i = 0; i < atomcount; i++)
@@ -475,8 +525,8 @@ double searchAssigns(int atomcount, int **allcands,
             }
         }
     }
-    int *history = (int *)alloca(sizeof(int) * atomcount);
-    int *histinds = (int *)alloca(sizeof(int) * atomcount);
+    int *history = (int *)malloca(sizeof(int) * atomcount);
+    int *histinds = (int *)malloca(sizeof(int) * atomcount);
     index = 0;
     for (i = 0; i < atomcount; i++)
     {
@@ -628,7 +678,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     int i;
     struct DockRMSD rmsd = {0, 0, "", ""};
     int **allcands = (int **)malloc(sizeof(int *) * atomcount);  //List of all atoms in the template that could feasibly be each query atom
-    int *candcounts = (int *)alloca(sizeof(char *) * atomcount); //Number of atoms in the template that could feasibly be each query atom
+    int *candcounts = (int *)malloca(sizeof(char *) * atomcount); //Number of atoms in the template that could feasibly be each query atom
 
     //Iterate through each query atom and determine which template atoms correspond to the query
     for (i = 0; i < atomcount; i++)

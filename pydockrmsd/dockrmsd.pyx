@@ -1,7 +1,6 @@
 import os
 import cython
 from libc.stdio cimport *  # noqa: E999
-script_dir = os.path.dirname(os.path.realpath(__file__))
 
 cdef extern from "stdio.h":
     # FILE * fopen ( const char * filename, const char * mode )
@@ -39,6 +38,7 @@ cdef class PyDockRMSD:
 
     Returns
     -------
+
         PyDockRMSD
             property:
             - rmsd : float
@@ -47,10 +47,15 @@ cdef class PyDockRMSD:
             - error : str
 
     C file Written by Eric Bell \
+
     v1.0 written 5/2/2019 \
-    latest update (v1.1) written 8/26/2019 \
+
+    Latest update (v1.1) written 8/26/2019 \
+
     Some modification was made to be entirely compatible with Cython Library. \
-    To be more precise all float is not rounded unlike normal binary.
+
+    To be more precise all float are not rounded unlike normal binary.
+
     """  # noqa: E501
     cdef DockRMSD data
 
@@ -63,7 +68,7 @@ cdef class PyDockRMSD:
         first_cfile = fopen(firstmolpath, "r")
         if first_cfile == NULL:
             raise FileNotFoundError(
-                2, "No such file or directory: '%s'" % first_mol_path)
+                2, "No such file or directory: '%s'", first_mol_path)
 
         second_mol_path_byte_string: bytes = second_mol_path.encode("UTF-8")
         cdef char * secondmolpath = second_mol_path_byte_string
@@ -71,7 +76,7 @@ cdef class PyDockRMSD:
         second_cfile = fopen(secondmolpath, "r")
         if second_cfile == NULL:
             raise FileNotFoundError(
-                2, "No such file or directory: '%s'" % second_mol_path)
+                2, "No such file or directory: '%s'", second_mol_path)
         self.data = dock_rmsd(first_cfile, second_cfile)
 
     @property
@@ -89,6 +94,7 @@ cdef class PyDockRMSD:
 
     @property
     def error(self) -> str:
+        """Return None if no error was found: str"""
         return self.data.error.decode("UTF-8")
 
 

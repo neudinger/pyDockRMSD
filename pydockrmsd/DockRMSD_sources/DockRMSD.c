@@ -7,31 +7,31 @@
 #include <ctype.h>
 #include <math.h>
 #include <float.h>
+#include <alloca.h>
+#define HFLAG 0      // Remove Hydrogenes
+#define SIMPLEFLAG 0 // Less is more
 /*
  DockRMSD: an open-source tool for atom mapping and RMSD calculation of symmetric molecules through graph isomorphism
 
- Written by Eric Bell
+ Written by Eric Bell And reviewed by Kevin Barre
+ 
  v1.0 written 5/2/2019
- latest update (v1.1) written 8/26/2019
-
- To compile, use:
- gcc DockRMSD.c -o DockRMSD -lm -O3
+ from latest update (v1.1) written 8/26/2019
+ ######################################################################
+ # DockRMSD (v1.1): docking pose distance calculation                 #
+ #                                                                    #
+ # If you use DockRMSD in your work, please cite:                     #
+ #                                                                    #
+ # Bell, E.W., Zhang, Y. DockRMSD: an open-source tool for atom       #
+ # mapping and RMSD calculation of symmetric molecules through graph  #
+ # isomorphism. Journal of Cheminformatics, 11:40 (2019).             #
+ ######################################################################
 */
-#define HFLAG 0
-#define SIMPLEFLAG 0
+
 const int MAXBONDS = 6;        //Maximum number of bonds allowable on a single atom
 const int MAXLINELENGTH = 150; //Maximum length (in characters) of a line in a mol2 file
 const double MAXMAPCOUNT = 0;  //Maximum amount of possible mappings before symmetry heuristic is used
 const int MAXDEPTH = 2;
-const char *header = "######################################################################\n"
-                     "# DockRMSD (v1.1): docking pose distance calculation                 #\n"
-                     "#                                                                    #\n"
-                     "# If you use DockRMSD in your work, please cite:                     #\n"
-                     "#                                                                    #\n"
-                     "# Bell, E.W., Zhang, Y. DockRMSD: an open-source tool for atom       #\n"
-                     "# mapping and RMSD calculation of symmetric molecules through graph  #\n"
-                     "# isomorphism. Journal of Cheminformatics, 11:40 (2019).             #\n"
-                     "######################################################################\n";
 
 int grabAtomCount(FILE *mol2, int hflag);
 int arrayIdentity(char **arr1, char **arr2, int arrlen);
@@ -41,7 +41,7 @@ int generalizeBonds(char ***bonds, int atomcount);
 char **buildTree(int depth, int index, char **atoms, char ***bonds, char *prestring, int prevind, int atomcount);
 double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assign, char ***tempbond, char ***querybond, double **querycoord, double **tempcoord, int *bestassign);
 struct DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char ***querybond, double **querycoord, double **tempcoord, int *querynums, int *tempnums, int atomcount, int simpleflag);
-int validateBonds(int *atomassign, int proposedatom, int assignpos, char ***querybond, char ***tempbond, double querydists[], int atomcount);
+int validateBonds(int *atomassign, int proposedatom, int assignpos, char ***querybond, char ***tempbond, int atomcount);
 struct DockRMSD make_and_send_point(FILE *query, FILE *template);
 
 typedef struct DockRMSD
@@ -56,52 +56,50 @@ struct DockRMSD dock_rmsd(FILE *query, FILE *template)
 {
     int querycount = grabAtomCount(query, HFLAG);
     int tempcount = grabAtomCount(template, HFLAG);
+    struct DockRMSD rmsd = {0, 0, "", ""};
     if (querycount != tempcount)
     {
-        // printf("%s\n","Error: Query and template don't have the same atom count!");
-        struct DockRMSD rmsd = {0, 0, "", "Error: Query and template don't have the same atom count!"};
+        rmsd.error = "Error: Query and template don't have the same atom count!";
         return rmsd;
     }
     if (querycount == 0)
     {
-        // printf("%s\n","Error: Query file has no atoms!");
-        struct DockRMSD rmsd = {0, 0, "", "Error: Query file has no atoms!"};
+        rmsd.error = "Error: Query file has no atoms!";
         return rmsd;
     }
     if (tempcount == 0)
     {
-        // printf("%s\n","Error: Template file has no atoms!");
-        struct DockRMSD rmsd = {0, 0, "", "Error: Template file has no atoms!"};
+        rmsd.error = "Error: Template file has no atoms!";
         return rmsd;
     }
     //Initialize pointer arrays and fill them with information from the mol2 files
-    char **queryatoms = malloc(sizeof(char *) * querycount);
-    double **querycoords = malloc(sizeof(double *) * querycount);
-    char ***querybonds = malloc(sizeof(char **) * querycount);
-    char **tempatoms = malloc(sizeof(char *) * tempcount);
-    double **tempcoords = malloc(sizeof(double *) * tempcount);
-    char ***tempbonds = malloc(sizeof(char **) * tempcount);
-    int *querynums = malloc(sizeof(int) * querycount);
-    int *tempnums = malloc(sizeof(int) * tempcount);
     int i, j;
+    char **queryatoms = alloca(sizeof(char *) * querycount);
+    double **querycoords = alloca(sizeof(double *) * querycount);
+    char ***querybonds = alloca(sizeof(char **) * querycount);
+    char **tempatoms = alloca(sizeof(char *) * tempcount);
+    double **tempcoords = alloca(sizeof(double *) * tempcount);
+    char ***tempbonds = alloca(sizeof(char **) * tempcount);
+    int *querynums = alloca(sizeof(int) * querycount);
+    int *tempnums = alloca(sizeof(int) * tempcount);
     for (i = 0; i < querycount; i++)
     {
-        char *queryatom = malloc(sizeof(char) * 3);
+        char *queryatom = alloca(sizeof(char) * 3);
         *(queryatoms + i) = queryatom;
-        char *tempatom = malloc(sizeof(char) * 3);
+        char *tempatom = alloca(sizeof(char) * 3);
         *(tempatoms + i) = tempatom;
-        double *querycoord = malloc(sizeof(double) * 3);
+        double *querycoord = alloca(sizeof(double) * 3);
         *(querycoords + i) = querycoord;
-        double *tempcoord = malloc(sizeof(double) * 3);
+        double *tempcoord = alloca(sizeof(double) * 3);
         *(tempcoords + i) = tempcoord;
-        char **querybondrow = malloc(sizeof(char *) * querycount);
-        char **tempbondrow = malloc(sizeof(char *) * tempcount);
+        char **querybondrow = alloca(sizeof(char *) * querycount);
+        char **tempbondrow = alloca(sizeof(char *) * tempcount);
         for (j = 0; j < querycount; j++)
         {
-            char *querybond = malloc(sizeof(char) * 3);
+            char *querybond = alloca(sizeof(char) * 3);
             strcpy(querybond, "");
             *(querybondrow + j) = querybond;
-            char *tempbond = malloc(sizeof(char) * 3);
+            char *tempbond = alloca(sizeof(char) * 3);
             strcpy(tempbond, "");
             *(tempbondrow + j) = tempbond;
         }
@@ -114,8 +112,7 @@ struct DockRMSD dock_rmsd(FILE *query, FILE *template)
     fclose(template);
     if (!arrayIdentity(queryatoms, tempatoms, querycount))
     {
-        // printf("%s\n","Template and query don't have the same atoms.");
-        struct DockRMSD rmsd = {0, 0, "", "Template and query don't have the same atoms."};
+        rmsd.error = "Template and query don't have the same atoms.";
         return rmsd;
     }
 
@@ -139,195 +136,13 @@ struct DockRMSD dock_rmsd(FILE *query, FILE *template)
         // If the general bonds still don't agree, the molecules aren't the same
         if (!arrayIdentity(flatquerybonds, flattempbonds, querycount * querycount))
         {
-            // printf("%s\n","Template and query don't have the same bonding network.");
-            struct DockRMSD rmsd = {0, 0, "", "Template and query don't have the same bonding network."};
+            rmsd.error = "Template and query don't have the same bonding network.";
             return rmsd;
         }
     }
     free(flatquerybonds);
     free(flattempbonds);
-    struct DockRMSD rmsd = assignAtoms(tempatoms, tempbonds, queryatoms, querybonds, querycoords, tempcoords, querynums, tempnums, querycount, SIMPLEFLAG);
-    return rmsd;
-}
-
-int main(int argc, char *argv[])
-{
-    //Check if all inputs are given and valid
-    if (argc < 3 || argc > 6)
-    {
-        printf("Program must have a query and template mol2 filename, and at most 3 options\n");
-        return 1;
-    }
-    FILE *query = fopen(argv[1], "r");
-    FILE *template = fopen(argv[2], "r");
-    if (query == NULL)
-    {
-        printf("Query file %s not found!\n", argv[1]);
-        return 1;
-    }
-    if (template == NULL)
-    {
-        printf("Template file %s not found!\n", argv[2]);
-        return 1;
-    }
-
-    //Runtime flag processing
-    int hflag = 0;
-    int corrflag = 0;
-    int simpleflag = 0;
-    int i;
-    for (i = 3; i < argc; i++)
-    {
-        if (!strcmp(argv[i], "-h"))
-        {
-            hflag = 1;
-        }
-        else if (!strcmp(argv[i], "-c"))
-        {
-            corrflag = 1;
-        }
-        else if (!strcmp(argv[i], "-s"))
-        {
-            simpleflag = 1;
-        }
-        else
-        {
-            printf("Unrecognized flag %s. Exiting...\n", argv[i]);
-            return 5;
-        }
-    }
-    if (!simpleflag)
-    {
-        printf("%s\n", header);
-    }
-    //Count how many atoms are in the query and template
-    int querycount = grabAtomCount(query, hflag);
-    int tempcount = grabAtomCount(template, hflag);
-    if (querycount != tempcount)
-    {
-        printf("%s\n", "Error: Query and template don't have the same atom count!");
-        return 2;
-    }
-
-    if (querycount == 0)
-    {
-        printf("%s\n", "Error: Query file has no atoms!");
-        return 2;
-    }
-    if (tempcount == 0)
-    {
-        printf("%s\n", "Error: Template file has no atoms!");
-        return 2;
-    }
-
-    //Initialize pointer arrays and fill them with information from the mol2 files
-    char **queryatoms = malloc(sizeof(char *) * querycount);
-    double **querycoords = malloc(sizeof(double *) * querycount);
-    char ***querybonds = malloc(sizeof(char **) * querycount);
-    char **tempatoms = malloc(sizeof(char *) * tempcount);
-    double **tempcoords = malloc(sizeof(double *) * tempcount);
-    char ***tempbonds = malloc(sizeof(char **) * tempcount);
-    int *querynums = malloc(sizeof(int) * querycount);
-    int *tempnums = malloc(sizeof(int) * tempcount);
-    int j;
-    for (i = 0; i < querycount; i++)
-    {
-        char *queryatom = malloc(sizeof(char) * 3);
-        *(queryatoms + i) = queryatom;
-        char *tempatom = malloc(sizeof(char) * 3);
-        *(tempatoms + i) = tempatom;
-        double *querycoord = malloc(sizeof(double) * 3);
-        *(querycoords + i) = querycoord;
-        double *tempcoord = malloc(sizeof(double) * 3);
-        *(tempcoords + i) = tempcoord;
-        char **querybondrow = malloc(sizeof(char *) * querycount);
-        char **tempbondrow = malloc(sizeof(char *) * tempcount);
-        for (j = 0; j < querycount; j++)
-        {
-            char *querybond = malloc(sizeof(char) * 3);
-            strcpy(querybond, "");
-            *(querybondrow + j) = querybond;
-            char *tempbond = malloc(sizeof(char) * 3);
-            strcpy(tempbond, "");
-            *(tempbondrow + j) = tempbond;
-        }
-        *(querybonds + i) = querybondrow;
-        *(tempbonds + i) = tempbondrow;
-    }
-    readMol2(queryatoms, querycoords, querybonds, querynums, query, querycount, hflag);
-    readMol2(tempatoms, tempcoords, tempbonds, tempnums, template, tempcount, hflag);
-    fclose(query);
-    fclose(template);
-    //generalizeBonds(querybonds,querycount);
-    //generalizeBonds(tempbonds,tempcount);
-    //Check that the query and template are in fact the same molecules
-    if (!arrayIdentity(queryatoms, tempatoms, querycount))
-    {
-        printf("%s\n", "Template and query don't have the same atoms.");
-        return 3;
-    }
-
-    char **flatquerybonds = malloc(sizeof(char *) * (querycount * querycount));
-    char **flattempbonds = malloc(sizeof(char *) * (tempcount * tempcount));
-    for (i = 0; i < querycount; i++)
-    {
-        memcpy(flatquerybonds + querycount * i, *(querybonds + i), sizeof(char *) * querycount);
-        memcpy(flattempbonds + tempcount * i, *(tempbonds + i), sizeof(char *) * tempcount);
-    }
-    if (!arrayIdentity(flatquerybonds, flattempbonds, querycount * querycount))
-    {
-        //Remove bond typing if they don't agree between query and template
-        generalizeBonds(querybonds, querycount);
-        generalizeBonds(tempbonds, tempcount);
-        for (i = 0; i < querycount; i++)
-        {
-            memcpy(flatquerybonds + querycount * i, *(querybonds + i), sizeof(char *) * querycount);
-            memcpy(flattempbonds + tempcount * i, *(tempbonds + i), sizeof(char *) * tempcount);
-        }
-        //If the general bonds still don't agree, the molecules aren't the same
-        if (!arrayIdentity(flatquerybonds, flattempbonds, querycount * querycount))
-        {
-            printf("%s\n", "Template and query don't have the same bonding network.");
-            return 3;
-        }
-    }
-    free(flatquerybonds);
-    free(flattempbonds);
-
-    //Find all mappings of template atoms onto query atoms and count how many valid mappings exist
-    if (!corrflag)
-    {
-        assignAtoms(tempatoms, tempbonds, queryatoms, querybonds, querycoords, tempcoords, querynums, tempnums, querycount, simpleflag);
-    }
-    else
-    {
-        for (i = 0; i < querycount; i++)
-        {
-            if (strcmp(*(queryatoms + i), *(tempatoms + i)))
-            {
-                printf("Atomic correspondence assumption is not valid: atom %d is %s in query, %s in template.\n", i, *(queryatoms + i), *(tempatoms + i));
-                return 5;
-            }
-        }
-        double squaredev = 0.0;
-        for (i = 0; i < querycount; i++)
-        {
-            for (j = 0; j < 3; j++)
-            {
-                squaredev += pow(*(*(querycoords + i) + j) - *(*(tempcoords + i) + j), 2.0);
-            }
-        }
-        double dockrmsd = pow(squaredev / ((double)querycount), 0.5);
-        if (simpleflag)
-        {
-            printf("%.3f\n", dockrmsd);
-        }
-        else
-        {
-            printf("Calculated Docking RMSD: %.3f\n", dockrmsd);
-        }
-    }
-    return 0;
+    return assignAtoms(tempatoms, tempbonds, queryatoms, querybonds, querycoords, tempcoords, querynums, tempnums, querycount, SIMPLEFLAG);
 }
 
 //Comparator for compatibility with qsort
@@ -336,9 +151,9 @@ int strcompar(const void *a, const void *b) { return strcmp(*(char **)a, *(char 
 //Returns 1 if two arrays contain the same string elements, otherwise returns 0
 int arrayIdentity(char **arr1, char **arr2, int arrlen)
 {
-    char *list1[arrlen];
-    char *list2[arrlen];
     int i;
+    char **list1 = (char **)alloca(sizeof(char *) * arrlen);
+    char **list2 = (char **)alloca(sizeof(char *) * arrlen);
     for (i = 0; i < arrlen; i++)
     {
         list1[i] = *(arr1 + i);
@@ -418,10 +233,11 @@ int grabAtomCount(FILE *mol2, int hflag)
 //Fills atoms, coords, and bonds with information contained within a mol2 file
 void readMol2(char **atoms, double **coords, char ***bonds, int *nums, FILE *mol2, int atomcount, int hflag)
 {
-    char line[MAXLINELENGTH];
-    int atomnums[atomcount]; //Keeps track of all non-H atom numbers for bond reading
     int i = 0;
     int sectionflag = 0; //Value is 1 when reading atoms, 2 when reading bonds, 0 before atoms, >2 after bonds
+    char line[MAXLINELENGTH];
+    int *atomnums = (int *)alloca(sizeof(int) * atomcount);
+    // int atomnums[atomcount]; //Keeps track of all non-H atom numbers for bond reading
     while (fgets(line, MAXLINELENGTH, mol2) != NULL)
     {
         if (strlen(line) > 1 && line[strlen(line) - 2] == '\r')
@@ -503,13 +319,15 @@ int generalizeBonds(char ***bonds, int atomcount)
 }
 
 //Recursive function that returns a pointer array of leaves in the bonding tree at a specified depth
-char **buildTree(int depth, int index, char **atoms, char ***bonds, char *prestring, int prevind, int atomcount)
+char **buildTree(int depth, int index,
+                 char **atoms, char ***bonds,
+                 char *prestring, int prevind, int atomcount)
 {
     // int n;
     if (depth == 0)
     { //Base case, if max depth is reached return the prestring
-        char **outp = malloc(sizeof(char *) * 2);
-        char *outstring = malloc(sizeof(char) * (strlen(prestring) + 1));
+        char **outp = (char **)malloc(sizeof(char *) * 2);
+        char *outstring = (char *)malloc(sizeof(char) * (strlen(prestring) + 1));
         strcpy(outstring, prestring);
         *outp = outstring;
         *(outp + 1) = NULL;
@@ -532,7 +350,7 @@ char **buildTree(int depth, int index, char **atoms, char ***bonds, char *prestr
             }
         }
         int maxleaves = (int)pow((double)MAXBONDS, (double)depth); //Maximum possible number of leaf nodes at this depth
-        char **outlist = malloc(sizeof(char *) * (maxleaves + 1));
+        char **outlist = (char **)malloc(sizeof(char *) * (maxleaves + 1));
         if (!outlist)
         { //If the outlist pointer wasn't allocated, you've hit the recursion limit
             return NULL;
@@ -572,23 +390,26 @@ char **buildTree(int depth, int index, char **atoms, char ***bonds, char *prestr
     }
 }
 
-double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assign, char ***tempbond, char ***querybond, double **querycoord, double **tempcoord, int *bestassign)
+double searchAssigns(int atomcount, int **allcands,
+                     int candcounts[], int *assign,
+                     char ***tempbond, char ***querybond,
+                     double **querycoord, double **tempcoord, int *bestassign)
 {
-    double **dists = malloc(sizeof(double *) * atomcount); //Distances between query atoms and template atoms
-    double querydists[atomcount * atomcount];              //Distances between all query atoms
-    int queryconnect[atomcount][MAXBONDS];
-    int bondcount[atomcount];
-    int connectcount[atomcount];
-    int index;
     int i;
     int j;
+    int index;
+    double **dists = (double **)malloc(sizeof(double *) * atomcount); //Distances between query atoms and template atoms
+    double *querydists = (double *)alloca(sizeof(double) * atomcount * atomcount);
+    int **queryconnect = (int **)alloca(sizeof(int *) * atomcount * MAXBONDS);
+    int *bondcount = (int *)alloca(sizeof(int) * atomcount);
+    int *connectcount = (int *)alloca(sizeof(int) * atomcount);
 
     //precalculate all query-template atomic distances
     for (i = 0; i < atomcount; i++)
     {
         *(assign + i) = -1;
         connectcount[i] = 0;
-        double *distind = malloc(sizeof(double) * candcounts[i]);
+        double *distind = (double *)malloc(sizeof(double) * candcounts[i]);
         for (j = 0; j < candcounts[i]; j++)
         {
             double dist = 0.0;
@@ -651,8 +472,8 @@ double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assig
             }
         }
     }
-    int history[atomcount];
-    int histinds[atomcount];
+    int *history = (int *)alloca(sizeof(int) * atomcount);
+    int *histinds = (int *)alloca(sizeof(int) * atomcount);
     index = 0;
     for (i = 0; i < atomcount; i++)
     {
@@ -670,7 +491,6 @@ double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assig
                 memcpy(bestassign, assign, sizeof(int) * atomcount);
                 bestTotal = runningTotal;
             }
-            //printf("%.2f\n",bestTotal);
             index--;
             runningTotal -= *(*(dists + history[index]) + histinds[index] - 1);
             continue;
@@ -723,7 +543,7 @@ double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assig
                 break;
             }
 
-            if (!inArray(*(*(allcands + history[index]) + i), assign, atomcount) && validateBonds(assign, *(*(allcands + history[index]) + i), history[index], querybond, tempbond, querydists, atomcount))
+            if (!inArray(*(*(allcands + history[index]) + i), assign, atomcount) && validateBonds(assign, *(*(allcands + history[index]) + i), history[index], querybond, tempbond, atomcount))
             { //Feasibility check
                 foundflag = 1;
                 *(assign + history[index]) = *(*(allcands + history[index]) + i);
@@ -768,14 +588,13 @@ double searchAssigns(int atomcount, int **allcands, int candcounts[], int *assig
 }
 
 //Checks if the assignment of the current atom is feasible
-int validateBonds(int *atomassign, int proposedatom, int assignpos, char ***querybond, char ***tempbond, double querydists[], int atomcount)
+int validateBonds(int *atomassign, int proposedatom,
+                  int assignpos, char ***querybond,
+                  char ***tempbond, int atomcount)
 {
-    // int i;
     int j;
-    // int k;
-
-    int queryinds[MAXBONDS];
     int queri = 0;
+    int queryinds[MAXBONDS];
     for (j = 0; j < atomcount; j++)
     {
         if (strcmp(*(*(querybond + assignpos) + j), ""))
@@ -797,12 +616,16 @@ int validateBonds(int *atomassign, int proposedatom, int assignpos, char ***quer
 }
 
 //Returns the lowest RMSD of all possible mappings for query atoms with template indices given the two molecules' bonding network
-DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char ***querybond, double **querycoord, double **tempcoord, int *querynums, int *tempnums, int atomcount, int simpleflag)
-{    
-    struct DockRMSD rmsd = {0, 0, "", ""};
-    int **allcands = malloc(sizeof(int *) * atomcount); //List of all atoms in the template that could feasibly be each query atom
-    int candcounts[atomcount];                          //Number of atoms in the template that could feasibly be each query atom
+DockRMSD assignAtoms(char **tempatom, char ***tempbond,
+                     char **queryatom, char ***querybond,
+                     double **querycoord, double **tempcoord,
+                     int *querynums, int *tempnums, int atomcount,
+                     int simpleflag)
+{
     int i;
+    struct DockRMSD rmsd = {0, 0, "", ""};
+    int **allcands = (int **)malloc(sizeof(int *) * atomcount);  //List of all atoms in the template that could feasibly be each query atom
+    int *candcounts = (int *)alloca(sizeof(char *) * atomcount); //Number of atoms in the template that could feasibly be each query atom
 
     //Iterate through each query atom and determine which template atoms correspond to the query
     for (i = 0; i < atomcount; i++)
@@ -878,7 +701,9 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char *
             {
                 if (!simpleflag)
                 {
-                    printf("No atoms mappable for atom %d, generalizing bonds...\n", i);
+                    char *formatstring = NULL;
+                    asprintf(&formatstring, "No atoms mappable for atom %d, generalizing bonds...\n", i);
+                    rmsd.error = formatstring;
                 }
                 generalizeBonds(tempbond, atomcount);
                 for (j = 0; j < i; j++)
@@ -891,7 +716,9 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char *
             }
             else
             {
-                printf("Atom assignment failed for atom %d.\n", i);
+                char *formatstring = NULL;
+                asprintf(&formatstring, "Atom assignment failed for atom %d.\n", i);
+                rmsd.error = formatstring;
                 return rmsd;
             }
         }
@@ -922,8 +749,8 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char *
         possiblemaps *= candcounts[i];
     }
     //Calculate RMSD of all possible mappings given each query atoms possible template atoms and return the minimum
-    int *assign = malloc(sizeof(int) * atomcount);
-    int *bestassign = malloc(sizeof(int) * atomcount);
+    int *assign = (int *)malloc(sizeof(int) * atomcount);
+    int *bestassign = (int *)malloc(sizeof(int) * atomcount);
     double bestrmsd = searchAssigns(atomcount, allcands, candcounts, assign, tempbond, querybond, querycoord, tempcoord, bestassign);
     char *header = "Optimal mapping (First file -> Second file, * indicates correspondence is not one-to-one):\n";
     char *optimal_mapping = (char *)malloc(strlen(header) + 1);
@@ -933,23 +760,18 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char *
     rmsd.total_of_possible_mappings = possiblemaps;
     if (bestrmsd == DBL_MAX)
     {
-        // printf("No valid mapping exists\n");
         rmsd.error = "No valid mapping exists\n";
         return rmsd;
     }
     for (i = 0; i < atomcount; i++)
     {
         if (0 > asprintf(&formatstring, "%s%3d -> %s%3d ", *(queryatom + i), *(querynums + i), *(tempatom + *(bestassign + i)), *(tempnums + *(bestassign + i))))
-        {
             return rmsd;
-        }
         optimal_mapping = (char *)realloc(optimal_mapping, strlen(optimal_mapping) + strlen(formatstring) + 1);
         strcat(optimal_mapping, formatstring);
         free(formatstring);
-        // printf("%s%3d -> %s%3d ", *(queryatom + i), *(querynums + i), *(tempatom + *(bestassign + i)), *(tempnums + *(bestassign + i)));
         if (*(querynums + i) == *(tempnums + *(bestassign + i)))
         {
-            // printf("\n");
             optimal_mapping = (char *)realloc(optimal_mapping, strlen(optimal_mapping) + 2);
             strcat(optimal_mapping, "\n");
         }
@@ -957,7 +779,6 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond, char **queryatom, char *
         {
             optimal_mapping = (char *)realloc(optimal_mapping, strlen(optimal_mapping) + 3);
             strcat(optimal_mapping, "*\n");
-            // printf("*\n");
         }
     }
     free(assign);

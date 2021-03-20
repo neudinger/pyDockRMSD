@@ -73,11 +73,8 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3 :: Only',
     ],
-    # project_urls={  # Optional
-    #     'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
-    #     'Funding': 'https://donate.pypi.org',
-    #     'Say Thanks!': 'http://saythanks.io/to/example',
-    #     'Source': 'https://github.com/pypa/sampleproject/',
-    # },
+    project_urls={  # Optional
+        'Source': 'https://github.com/neudinger/pyDockRMSD',
+    },
 )
 # os.remove(f"{here}/pydockrmsd/dockrmsd.c")

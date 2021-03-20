@@ -19,3 +19,4 @@ dist/
 wheelhouse/
 __version__.py
 pydockrmsd.egg-info/
+core

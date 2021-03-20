@@ -30,10 +30,10 @@
  ######################################################################
 */
 
-const int MAXBONDS = 6;        //Maximum number of bonds allowable on a single atom
-const int MAXLINELENGTH = 150; //Maximum length (in characters) of a line in a mol2 file
-const double MAXMAPCOUNT = 0;  //Maximum amount of possible mappings before symmetry heuristic is used
-const int MAXDEPTH = 2;
+#define MAXBONDS 6        //Maximum number of bonds allowable on a single atom
+#define MAXLINELENGTH 150 //Maximum length (in characters) of a line in a mol2 file
+#define MAXMAPCOUNT 0     //Maximum amount of possible mappings before symmetry heuristic is used
+#define MAXDEPTH 2
 
 int grabAtomCount(FILE *mol2, int hflag);
 int arrayIdentity(char **arr1, char **arr2, int arrlen);
@@ -76,32 +76,32 @@ struct DockRMSD dock_rmsd(FILE *query, FILE *template)
     }
     //Initialize pointer arrays and fill them with information from the mol2 files
     int i, j;
-    char **queryatoms = alloca(sizeof(char *) * querycount);
-    double **querycoords = alloca(sizeof(double *) * querycount);
-    char ***querybonds = alloca(sizeof(char **) * querycount);
-    char **tempatoms = alloca(sizeof(char *) * tempcount);
-    double **tempcoords = alloca(sizeof(double *) * tempcount);
-    char ***tempbonds = alloca(sizeof(char **) * tempcount);
-    int *querynums = alloca(sizeof(int) * querycount);
-    int *tempnums = alloca(sizeof(int) * tempcount);
+    char **queryatoms = (char **)alloca(sizeof(char *) * querycount);
+    double **querycoords = (double **)alloca(sizeof(double *) * querycount);
+    char ***querybonds = (char ***)alloca(sizeof(char **) * querycount);
+    char **tempatoms = (char **)alloca(sizeof(char *) * tempcount);
+    double **tempcoords = (double **)alloca(sizeof(double *) * tempcount);
+    char ***tempbonds = (char ***)alloca(sizeof(char **) * tempcount);
+    int *querynums = (int *)alloca(sizeof(int) * querycount);
+    int *tempnums = (int *)alloca(sizeof(int) * tempcount);
     for (i = 0; i < querycount; i++)
     {
-        char *queryatom = alloca(sizeof(char) * 3);
+        char *queryatom = (char *)alloca(sizeof(char) * 3);
         *(queryatoms + i) = queryatom;
-        char *tempatom = alloca(sizeof(char) * 3);
+        char *tempatom = (char *)alloca(sizeof(char) * 3);
         *(tempatoms + i) = tempatom;
-        double *querycoord = alloca(sizeof(double) * 3);
+        double *querycoord = (double *)alloca(sizeof(double) * 3);
         *(querycoords + i) = querycoord;
-        double *tempcoord = alloca(sizeof(double) * 3);
+        double *tempcoord = (double *)alloca(sizeof(double) * 3);
         *(tempcoords + i) = tempcoord;
-        char **querybondrow = alloca(sizeof(char *) * querycount);
-        char **tempbondrow = alloca(sizeof(char *) * tempcount);
+        char **querybondrow = (char **)alloca(sizeof(char *) * querycount);
+        char **tempbondrow = (char **)alloca(sizeof(char *) * tempcount);
         for (j = 0; j < querycount; j++)
         {
-            char *querybond = alloca(sizeof(char) * 3);
+            char *querybond = (char *)alloca(sizeof(char) * 3);
             strcpy(querybond, "");
             *(querybondrow + j) = querybond;
-            char *tempbond = alloca(sizeof(char) * 3);
+            char *tempbond = (char *)alloca(sizeof(char) * 3);
             strcpy(tempbond, "");
             *(tempbondrow + j) = tempbond;
         }
@@ -363,7 +363,8 @@ char **buildTree(int depth, int index,
         {
             if (bondinds[i] != prevind)
             { //Don't analyze the atom we just came from in the parent function call
-                char newpre[strlen(prestring) + 8];
+                // char newpre[strlen(prestring) + 8];
+                char *newpre = (char *)alloca(strlen(prestring) + 8);
                 strcpy(newpre, prestring);
                 strcat(newpre, bondtypes[i]);
                 strcat(newpre, *(atoms + bondinds[i]));
@@ -633,8 +634,8 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     for (i = 0; i < atomcount; i++)
     {
         int j;
-        int candidates[atomcount]; //Flags corresponding to if each template atom could correspond to the current query atom
-        int viablecands = 0;       //Count of template atoms that could correspond to the current query atom
+        int *candidates = (int *)calloc(atomcount, sizeof(int)); //Flags corresponding to if each template atom could correspond to the current query atom
+        int viablecands = 0;                                     //Count of template atoms that could correspond to the current query atom
         for (j = 0; j < atomcount; j++)
         {
             if (!strcmp(*(queryatom + i), *(tempatom + j)))
@@ -704,7 +705,8 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
                 if (!simpleflag)
                 {
                     char *formatstring = NULL;
-                    asprintf(&formatstring, "No atoms mappable for atom %d, generalizing bonds...\n", i);
+                    if (0 > asprintf(&formatstring, "No atoms mappable for atom %d, generalizing bonds...\n", i))
+                        return rmsd;
                     rmsd.error = formatstring;
                 }
                 generalizeBonds(tempbond, atomcount);
@@ -719,7 +721,8 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
             else
             {
                 char *formatstring = NULL;
-                asprintf(&formatstring, "Atom assignment failed for atom %d.\n", i);
+                if (0 > asprintf(&formatstring, "Atom assignment failed for atom %d.\n", i))
+                    return rmsd;
                 rmsd.error = formatstring;
                 return rmsd;
             }
@@ -743,6 +746,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
             }
             *(allcands + i) = atomcands;
         }
+        free(candidates);
     }
 
     double possiblemaps = 1.0;

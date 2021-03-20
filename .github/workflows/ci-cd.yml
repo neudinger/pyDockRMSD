@@ -31,7 +31,7 @@ jobs:
   #         prerelease: false
   build:
     name: Build ${{ matrix.os }}
-    needs: create_release
+    # needs: create_release
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true

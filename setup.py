@@ -1,5 +1,4 @@
 import os
-import sys
 import pathlib
 import re
 from typing import List
@@ -29,7 +28,7 @@ extensions: List[Extension] = [
         # Cannot be use on cross platform
         # extra_link_args=["-lm"],
         extra_compile_args=["-static-libgcc", "--static"] if
-        sys.platform == 'linux' else [],
+        os.name == 'posix' else ["/NODEFAULTLIB:libcmt.lib"],
         include_dirs=['pydockrmsd/DockRMSD_sources'],
         sources=["pydockrmsd/dockrmsd.pyx"],
     )

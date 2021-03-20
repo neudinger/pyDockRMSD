@@ -1,13 +1,15 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
+#ifdef __unix__
+#include <alloca.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
 #include <float.h>
-#include <alloca.h>
 #define HFLAG 0      // Remove Hydrogenes
 #define SIMPLEFLAG 0 // Less is more
 /*

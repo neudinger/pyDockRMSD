@@ -71,7 +71,9 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 
 ### Tools used
 
-![Cython](https://cython.readthedocs.io/en/latest/_static/cythonlogo.png) ![Python](https://www.python.org/static/img/python-logo.png) <img src="https://pdoc3.github.io/pdoc/logo.png" alt="drawing" style="width:100px;"/>
+![Cython](https://cython.readthedocs.io/en/latest/_static/cythonlogo.png) ![Python](https://www.python.org/static/img/python-logo.png)
+
+<img src="https://pdoc3.github.io/pdoc/logo.png" width="100" height="100">
 
 - [cython](https://cython.readthedocs.io/en/latest/)
 - [pdoc3](https://pdoc3.github.io/pdoc/)

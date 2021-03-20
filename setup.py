@@ -46,9 +46,6 @@ setup(
     ext_modules=cythonize(extensions, annotate=False),
     python_requires=">=3.6",
     install_requires=[],
-    #     project_urls={
-    #         "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
-    #     },
     classifiers=[
         # How mature is this project ? Common values are
         #   3 - Alpha
@@ -64,6 +61,7 @@ setup(
         "Operating System :: POSIX",
         "Operating System :: Unix",
         "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
         'Programming Language :: Python :: 3',

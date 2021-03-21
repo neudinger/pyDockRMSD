@@ -108,6 +108,7 @@ pdoc3 pydockrmsd --http localhost:8080
 Tag:
 
 - v: Version
+- b: Build
 - d: Documentation
 - p: Publish
 - t: Test

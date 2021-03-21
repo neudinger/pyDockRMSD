@@ -27,8 +27,8 @@ extensions: List[Extension] = [
         name="pydockrmsd.dockrmsd",
         # Cannot be use on cross platform
         # extra_link_args=["-lm"],
-        extra_compile_args=["-static-libgcc", "--static"] if
-        os.name == 'posix' else [],
+        # extra_compile_args=["-static-libgcc", "--static"] if
+        # os.name == 'posix' else [],
         include_dirs=['pydockrmsd/DockRMSD_sources'],
         sources=["pydockrmsd/dockrmsd.pyx"],
     )

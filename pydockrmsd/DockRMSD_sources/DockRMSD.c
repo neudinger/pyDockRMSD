@@ -1,14 +1,14 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
-#ifdef __unix__
-#include <alloca.h>
-#define malloca alloca
-//linux code goes here
-#elif _WIN32
+#ifdef _WIN32
+// windows code goes here
 #include <windows.h>
 #define malloca _alloca
-// windows code goes here
+#else
+//posix code goes here
+#include <alloca.h>
+#define malloca alloca
 #endif
 #include <float.h>
 #include <stdio.h>   /* needed for vsnprintf */
@@ -672,7 +672,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
 {
     int i;
     struct DockRMSD rmsd = {0, 0, "", ""};
-    int **allcands = (int **)malloc(sizeof(int *) * atomcount);  //List of all atoms in the template that could feasibly be each query atom
+    int **allcands = (int **)malloc(sizeof(int *) * atomcount);   //List of all atoms in the template that could feasibly be each query atom
     int *candcounts = (int *)malloca(sizeof(char *) * atomcount); //Number of atoms in the template that could feasibly be each query atom
 
     //Iterate through each query atom and determine which template atoms correspond to the query

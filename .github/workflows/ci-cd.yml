@@ -72,7 +72,7 @@ jobs:
           python -m pip install twine
           twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/*
       - name: Deploy to PyPI Windows
-        if: ${{ contains(github.ref, 'p') && matrix.os != 'windows-2019'}}
+        if: ${{ contains(github.ref, 'p') && matrix.os == 'windows-2019'}}
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}

@@ -4,9 +4,6 @@ on:
   push:
     tags:
       - "*"
-    # branches:
-    #   - main
-    # Sequence of patterns matched against refs/tags
 # https://github.com/actions/upload-release-asset
 
 jobs:

@@ -32,7 +32,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, macOS-10.15, windows-2019]
+      # ubuntu-20.04, macOS-10.15,
+        os: [ windows-2019]
     if: contains(github.ref, 'v')
     steps:
       - uses: actions/setup-python@v2

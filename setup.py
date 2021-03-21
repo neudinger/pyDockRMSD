@@ -76,4 +76,3 @@ setup(
         'Source': 'https://github.com/neudinger/pyDockRMSD',
     },
 )
-# os.remove(f"{here}/pydockrmsd/dockrmsd.c")

@@ -1,6 +1,6 @@
 name: Build pydockrmsd
 
-on: 
+on:
   push:
     tags:
       - "*"
@@ -36,8 +36,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-      # ubuntu-20.04, macOS-10.15, 
-        os: [windows-2019]
+        os: [ubuntu-20.04, macOS-10.15, windows-2019]
     if: contains(github.ref, 'v')
     steps:
       - uses: actions/setup-python@v2
@@ -75,4 +74,4 @@ jobs:
         run: |
           dir ./wheelhouse/
         # python -m pip install twine
-        # twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/*.whl
+        # twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/

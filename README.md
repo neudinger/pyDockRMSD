@@ -68,6 +68,7 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 
 - Linux
 - Mac OS
+- Windows
 
 ### Tools used
 
@@ -82,6 +83,21 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 - [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/) (cross compilation)
 
 ## Documentation
+
+## Simple Usage
+
+```python
+from pydockrmsd.dockrmsd import PyDockRMSD
+import pydockrmsd.hungarian as hungarian
+dockrmsd = PyDockRMSD("./data/targets/1a8i/crystal.mol2",
+                      "./data/targets/1a8i/vina1.mol2")
+print(dockrmsd.rmsd)
+print(dockrmsd.total_of_possible_mappings)
+print(dockrmsd.optimal_mapping)
+print(dockrmsd.error)
+print(hungarian("./data/targets/1a8i/crystal.mol2",
+                "./data/targets/1a8i/vina1.mol2"))
+```
 
 ### Local documentation
 

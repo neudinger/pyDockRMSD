@@ -90,11 +90,14 @@ cdef class PyDockRMSD:
 
     @property
     def optimal_mapping(self) -> str:
+        """Find the deterministically optimal mapping between query and template
+        atoms, an exhaustive assignment search reminiscent of the VF2 algorithm
+        coupled with Dead-End Elimination (DEE) is implemented."""
         return self.data.optimal_mapping.decode("UTF-8")
 
     @property
     def error(self) -> str:
-        """Return None if no error was found: str"""
+        """Return empty str if no error was found: str"""
         return self.data.error.decode("UTF-8")
 
 

@@ -1,9 +1,6 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
-// #include <string.h>
-// #include <ctype.h>
-// #include <math.h>
 #ifdef __unix__
 #include <alloca.h>
 #define malloca alloca
@@ -13,7 +10,6 @@
 #define malloca _alloca
 // windows code goes here
 #endif
-
 #include <float.h>
 #include <stdio.h>   /* needed for vsnprintf */
 #include <stdlib.h>  /* needed for malloc-free */
@@ -276,7 +272,7 @@ int grabAtomCount(FILE *mol2, int hflag)
     }
     if (ferror(mol2))
     {
-        printf("Error %d while reading in file.\n", ferror(mol2));
+        fprintf(stderr, "Error %d while reading in file.\n", ferror(mol2));
     }
     rewind(mol2); //resets the file pointer for use in other functions
     return atomcount;
@@ -585,7 +581,6 @@ double searchAssigns(int atomcount, int **allcands,
             {
                 connectcount[queryconnect[history[index]][i]]++;
             }
-            //printf("Next atom: %d\n",nextAtom);
         }
         int foundflag = 0;
         for (i = histinds[index]; i < candcounts[history[index]]; i++)

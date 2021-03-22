@@ -78,7 +78,7 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 - [cython](https://cython.readthedocs.io/en/latest/)
 - [pdoc3](https://pdoc3.github.io/pdoc/)
 - [pandoc](https://pandoc.org/)
-- panda
+- pandas
 - pyarrow (file.parquet as file storage system)
 - [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/) (cross compilation)
 
@@ -109,5 +109,6 @@ Tag:
 
 - v: Version
 - d: Documentation
+- b: Build
 - p: Publish
 - t: Test

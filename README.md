@@ -56,7 +56,7 @@ pip install pydockrmsd # pypi source
 ## Example
 
 - [crystal_bench.py](https://github.com/neudinger/pyDockRMSD/blob/main/examples/crystal_bench.py)
-  - `rdkit, pandas, pyarrow` required
+  - `rdkit, pandas, numpy, pyarrow` required
 - [crystal_bench.ipynb](https://github.com/neudinger/pyDockRMSD/blob/main/examples/crystal_bench.ipynb)
 [DockRMSD Website](https://zhanglab.ccmb.med.umich.edu/DockRMSD/) python Wrapper: docking pose distance calculation
 
@@ -68,16 +68,36 @@ PyDockRMSD Written by Barre Kevin, DockRMSD Written by Eric Bell
 
 - Linux
 - Mac OS
+- Windows
 
-Tools used:
+### Tools used
 
-- cython
+![Cython](https://cython.readthedocs.io/en/latest/_static/cythonlogo.png) ![Python](https://www.python.org/static/img/python-logo.png)
+<img src="https://pdoc3.github.io/pdoc/logo.png" width="100" height="100">
+
+- [cython](https://cython.readthedocs.io/en/latest/)
 - [pdoc3](https://pdoc3.github.io/pdoc/)
 - [pandoc](https://pandoc.org/)
+- panda
 - pyarrow (file.parquet as file storage system)
 - [cibuildwheel](https://cibuildwheel.readthedocs.io/en/stable/) (cross compilation)
 
 ## Documentation
+
+## Simple Usage
+
+```python
+from pydockrmsd.dockrmsd import PyDockRMSD
+import pydockrmsd.hungarian as hungarian
+dockrmsd = PyDockRMSD("./data/targets/1a8i/crystal.mol2",
+                      "./data/targets/1a8i/vina1.mol2")
+print(dockrmsd.rmsd)
+print(dockrmsd.total_of_possible_mappings)
+print(dockrmsd.optimal_mapping)
+print(dockrmsd.error)
+print(hungarian("./data/targets/1a8i/crystal.mol2",
+                "./data/targets/1a8i/vina1.mol2"))
+```
 
 ### Local documentation
 

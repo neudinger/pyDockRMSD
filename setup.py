@@ -26,8 +26,9 @@ extensions: List[Extension] = [
     Extension(
         name="pydockrmsd.dockrmsd",
         # Cannot be use on cross platform
-        # extra_compile_args=["-static-libgcc", "--static", "-O3"],
         # extra_link_args=["-lm"],
+        # extra_compile_args=["-static-libgcc", "--static"] if
+        # os.name == 'posix' else [],
         include_dirs=['pydockrmsd/DockRMSD_sources'],
         sources=["pydockrmsd/dockrmsd.pyx"],
     )
@@ -46,9 +47,6 @@ setup(
     ext_modules=cythonize(extensions, annotate=False),
     python_requires=">=3.6",
     install_requires=[],
-    #     project_urls={
-    #         "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
-    #     },
     classifiers=[
         # How mature is this project ? Common values are
         #   3 - Alpha
@@ -64,6 +62,7 @@ setup(
         "Operating System :: POSIX",
         "Operating System :: Unix",
         "Operating System :: MacOS",
+        "Operating System :: Microsoft :: Windows",
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
         'Programming Language :: Python :: 3',
@@ -73,11 +72,7 @@ setup(
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3 :: Only',
     ],
-    # project_urls={  # Optional
-    #     'Bug Reports': 'https://github.com/pypa/sampleproject/issues',
-    #     'Funding': 'https://donate.pypi.org',
-    #     'Say Thanks!': 'http://saythanks.io/to/example',
-    #     'Source': 'https://github.com/pypa/sampleproject/',
-    # },
+    project_urls={  # Optional
+        'Source': 'https://github.com/neudinger/pyDockRMSD',
+    },
 )
-# os.remove(f"{here}/pydockrmsd/dockrmsd.c")

@@ -1,15 +1,9 @@
 name: Build pydockrmsd
 
-on: 
+on:
   push:
     tags:
       - "*"
-    # branches:
-    #   - main
-    # Sequence of patterns matched against refs/tags
-# https://github.com/actions/upload-release-asset
-# windows-2019
-
 jobs:
   create_release:
     if: contains(github.ref, 'v')
@@ -36,7 +30,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-20.04, macOS-10.15]
+        os: [ubuntu-20.04, macOS-10.15, windows-2019]
     if: contains(github.ref, 'v')
     steps:
       - uses: actions/setup-python@v2
@@ -51,7 +45,7 @@ jobs:
           version: ${{ github.ref }}
           CIBW_ENVIRONMENT: "version=${{ github.ref }}"
         run: |
-          python -m cibuildwheel --output-dir wheelhouse
+          python -m cibuildwheel --output-dir dist
       - name: Upload Release Assets
         id: upload-release-assets
         uses: dwenegar/upload-release-assets@v1
@@ -59,18 +53,22 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ needs.create_release.outputs.id }}
-          assets_path: ./wheelhouse/
+          assets_path: ./dist/
       # - name: Run Unit Test
       #   if: ${{ contains(github.ref, 't') }}
       # - name: Generate Documentation
       #   if: ${{ contains(github.ref, 'd') && matrix.os == 'ubuntu-20.04' }}
       #   run: |
       #     pip install pdoc3
-      - name: Deploy to PyPI
-        if: contains(github.ref, 'p')
+      - name: Deploy to PyPI ${{ matrix.os }}
+        if: ${{ contains(github.ref, 'p') && matrix.os != 'windows-2019'}}
         env:
-          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
         run: |
           python -m pip install twine
-          twine upload -u __token__ -p $TWINE_PASSWORD ./wheelhouse/*.whl
+          twine upload -u __token__ -p $TWINE_PASSWORD dist/*
+      - name: Deploy to PyPI ${{ matrix.os }}
+        if: ${{ contains(github.ref, 'p') && matrix.os == 'windows-2019'}}
+        run: |
+          python -m pip install twine
+          twine upload -u __token__ -p ${{ secrets.PYPI_PASSWORD }} dist/*

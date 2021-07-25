@@ -1,10 +1,15 @@
 # DockRMSD
 
-## Descriptions
-
-[![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE) [![Build Github Status](https://github.com/neudinger/pyDockRMSD/workflows/Build%20pydockrmsd/badge.svg)](https://github.com/neudinger/pyDockRMSD/actions)
+## Abstract
 
 Docked Root-mean-square deviation of atomic positions [Paper](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-019-0362-7)
+
+DockRMSD is capable of deterministically identifying the minimum symmetry-corrected RMSD and is able to do so without significant loss of computational efficiency compared to other methods. The open-source DockRMSD program can be conveniently integrated with various docking pipelines to assist with accurate atomic mapping and RMSD calculations, which can therefore help improve docking performance, especially for ligand molecules with complicated structural symmetry
+
+## Descriptions
+
+
+[![GitHub license](https://img.shields.io/badge/license-EUPL-blue.svg)](https://raw.githubusercontent.com/herotc/hero-rotation/master/LICENSE) [![Build Github Status](https://github.com/neudinger/pyDockRMSD/workflows/Build%20pydockrmsd/badge.svg)](https://github.com/neudinger/pyDockRMSD/actions) [![PyPI version](https://badge.fury.io/py/pydockrmsd.svg)](https://badge.fury.io/py/pydockrmsd)
 
 ![formula](https://render.githubusercontent.com/render/math?math={\mathrm{RMSD}=\sqrt{\frac{1}{N}\sum_{i=1}^N\delta_i^2}})
 

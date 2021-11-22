@@ -1,10 +1,9 @@
+#!/usr/bin/env bash
 current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 . "$current_dir/info.sh" && \
-python -m build . && \
-# python -m cibuildwheel --platform linux \
-# pip install --force dist/pydockrmsd-${version}-py3-none-any.whl && \
-pip install --force dist/pydockrmsd-${version}-cp38-cp38-linux_x86_64.whl && \
+python setup.py bdist_wheel && \
+pip install --force dist/pydockrmsd-${version}-*.whl && \
 printf "pydockrmsd " && \
 python -c "import pydockrmsd; print(pydockrmsd.__version__, end='');" && \
 echo " correctly installed";
-rm -r build/
+cd examples && python3 crystal_example.py

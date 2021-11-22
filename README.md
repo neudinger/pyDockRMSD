@@ -33,18 +33,34 @@ $$ -->
 
 ## Usage
 
+Please use mamba for fast download and installation
+
+```sh
+conda install mamba -n base -c conda-forge
+```
+
 ### Local Install
 
-Linux only:
+*NIX systems only:
+Linux and MacOS
+
+Remove all previous pydockrmsd installation
+
+> If you have MacOS with apple silicon 'M' processor, please use manual installation.
+> Github Action cannot handle apple silicon yet
 
 ```bash
-conda env create --name pydockrmsd --file condaenv/requirement.yml
+pip uninstall pydockrmsd
+```
+
+```bash
+mamba env create --name pydockrmsd --file condaenv/requirement.yml
 conda activate pydockrmsd
-conda env update --name pydockrmsd --file condaenv/ci-cd.yml
+mamba env update --name pydockrmsd --file condaenv/ci-cd.yml --prune
 ./scripts/install.sh
 ```
 
-### Requirement
+### Pypi install
 
 Build Requirement
 

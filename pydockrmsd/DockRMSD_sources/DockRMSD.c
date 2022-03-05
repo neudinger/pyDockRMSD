@@ -1,15 +1,6 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif
-#ifdef _WIN32
-// windows code goes here
-#include <windows.h>
-#define malloca _alloca
-#else
-// posix code goes here
-#include <alloca.h>
-#define malloca alloca
-#endif
 #include <float.h>
 #include <stdio.h>   /* needed for vsnprintf */
 #include <stdlib.h>  /* needed for malloc-free */
@@ -294,7 +285,7 @@ void readMol2(char **atoms, double **coords, char ***bonds, int *nums, FILE *mol
     int i = 0;
     int sectionflag = 0; // Value is 1 when reading atoms, 2 when reading bonds, 0 before atoms, >2 after bonds
     char line[MAXLINELENGTH];
-    int *atomnums = (int *)malloca(sizeof(int) * atomcount); // Keeps track of all non-H atom numbers for bond reading
+    int *atomnums = (int *)malloc(sizeof(int) * atomcount); // Keeps track of all non-H atom numbers for bond reading
     while (fgets(line, MAXLINELENGTH, mol2) != NULL)
     {
         if (strlen(line) > 1 && line[strlen(line) - 2] == '\r')
@@ -351,6 +342,7 @@ void readMol2(char **atoms, double **coords, char ***bonds, int *nums, FILE *mol
     {
         *(nums + i) = atomnums[i];
     }
+    free(atomnums);
 }
 
 // Changes all bond types to generic "b" if the bond types don't agree between query and template. Returns true if this has already been done, false if not.
@@ -419,12 +411,13 @@ char **buildTree(int depth, int index,
             if (bondinds[i] != prevind)
             { // Don't analyze the atom we just came from in the parent function call
                 // char newpre[strlen(prestring) + 8];
-                char *newpre = (char *)malloca(strlen(prestring) + 8);
+                char *newpre = (char *)malloc(strlen(prestring) + 8);
                 strcpy(newpre, prestring);
                 strcat(newpre, bondtypes[i]);
                 strcat(newpre, *(atoms + bondinds[i]));
                 // Recurse and fetch all leaves of the binding tree for this neighbor
                 char **new = buildTree(depth - 1, bondinds[i], atoms, bonds, newpre, index, atomcount);
+                free(newpre);
                 char **newit = new;
                 while (*newit)
                 { // Append the new leaves onto outlist
@@ -461,8 +454,8 @@ double searchAssigns(int atomcount, int **allcands,
         queryconnect[i] = (int *)malloc(MAXBONDS * sizeof(int *));
     }
 
-    int *bondcount = (int *)malloca(sizeof(int) * atomcount);
-    int *connectcount = (int *)malloca(sizeof(int) * atomcount);
+    int *bondcount = (int *)malloc(sizeof(int) * atomcount);
+    int *connectcount = (int *)malloc(sizeof(int) * atomcount);
     // precalculate all query-template atomic distances
     for (int i = 0; i < atomcount; i++)
     {
@@ -529,8 +522,8 @@ double searchAssigns(int atomcount, int **allcands,
             }
         }
     }
-    int *history = (int *)malloca(sizeof(int) * atomcount);
-    int *histinds = (int *)malloca(sizeof(int) * atomcount);
+    int *history = (int *)malloc(sizeof(int) * atomcount);
+    int *histinds = (int *)malloc(sizeof(int) * atomcount);
     for (int i = 0; i < atomcount; i++)
     {
         histinds[i] = 0;
@@ -628,6 +621,10 @@ double searchAssigns(int atomcount, int **allcands,
             }
         }
     }
+    free(histinds);
+    free(history);
+    free(bondcount);
+    free(connectcount);
     for (int i = 0; i < atomcount; i++)
     {
         free(*(dists + i));

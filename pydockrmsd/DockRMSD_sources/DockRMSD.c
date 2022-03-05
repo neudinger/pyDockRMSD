@@ -1,3 +1,6 @@
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
 #include <float.h>
 #include <stdio.h>   /* needed for vsnprintf */
 #include <stdlib.h>  /* needed for malloc-free */
@@ -676,7 +679,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
                      DockRMSD rmsd)
 {
     int **allcands = (int **)malloc(sizeof(int *) * atomcount); // List of all atoms in the template that could feasibly be each query atom
-    int *candcounts = (int *)malloc(atomcount * sizeof(int)); // Number of atoms in the template that could feasibly be each query atom
+    int *candcounts = (int *)alloca(atomcount * sizeof(int *)); // Number of atoms in the template that could feasibly be each query atom
     // Iterate through each query atom and determine which template atoms correspond to the query
     for (int i = 0; i < atomcount; i++)
     {
@@ -849,7 +852,6 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     rmsd.optimal_mapping = optimal_mapping;
     for (int i = 0; i < atomcount; i++)
         free(allcands[i]);
-    free(candcounts);
     free(allcands);
     free(assign);
     free(bestassign);

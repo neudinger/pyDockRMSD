@@ -1,3 +1,4 @@
+# Copyright (c) 2021 Barre kevin - All rights reserved.
 channels:
   - defaults
   - conda-forge
@@ -9,4 +10,3 @@ dependencies:
   - pip
   - pip:
       - pyarrow
-      - table

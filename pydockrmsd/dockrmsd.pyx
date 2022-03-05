@@ -1,6 +1,7 @@
 import os
 import cython
 from libc.stdio cimport *  # noqa: E999
+from libc.stdlib cimport free
 
 cdef extern from "stdio.h":
     # FILE * fopen ( const char * filename, const char * mode )
@@ -99,17 +100,3 @@ cdef class PyDockRMSD:
     def error(self) -> str:
         """Return empty str if no error was found: str"""
         return self.data.error.decode("UTF-8")
-
-
-# @cython.embedsignature(True)
-# @cython.binding(True)
-# def grab_Atom_Count(file_path: str, hflag: int = 0) -> int:
-#     file_path_byte_string: bytes = file_path.encode("UTF-8")
-#     cdef size_t c_hflag = hflag
-#     cdef char * fpath = file_path_byte_string
-#     cdef FILE * cfile
-#     cfile = fopen(fpath, "r")
-#     if cfile == NULL:
-#         raise FileNotFoundError(
-#             2, "No such file or directory: '%s'" % file_path)
-#     return grabAtomCount(cfile, & c_hflag)

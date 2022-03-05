@@ -1,5 +1,11 @@
 # DockRMSD
 
+[![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
+[![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
+[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
+
+[![PyPI implementation](https://img.shields.io/pypi/implementation/pydockrmsd.svg)](https://pypi.python.org/pypi/pydockrmsd/)
+
 ## Abstract
 
 Docked Root-mean-square deviation of atomic positions [Paper](https://jcheminf.biomedcentral.com/articles/10.1186/s13321-019-0362-7)

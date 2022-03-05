@@ -1,6 +1,3 @@
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE 1
-#endif
 #include <float.h>
 #include <stdio.h>   /* needed for vsnprintf */
 #include <stdlib.h>  /* needed for malloc-free */
@@ -679,7 +676,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
                      DockRMSD rmsd)
 {
     int **allcands = (int **)malloc(sizeof(int *) * atomcount); // List of all atoms in the template that could feasibly be each query atom
-    int *candcounts = (int *)alloca(atomcount * sizeof(int *)); // Number of atoms in the template that could feasibly be each query atom
+    int *candcounts = (int *)malloc(atomcount * sizeof(int)); // Number of atoms in the template that could feasibly be each query atom
     // Iterate through each query atom and determine which template atoms correspond to the query
     for (int i = 0; i < atomcount; i++)
     {
@@ -852,6 +849,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     rmsd.optimal_mapping = optimal_mapping;
     for (int i = 0; i < atomcount; i++)
         free(allcands[i]);
+    free(candcounts);
     free(allcands);
     free(assign);
     free(bestassign);
@@ -866,16 +864,16 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     return rmsd;
 }
 
-// int main(int argc, char const *argv[])
-// {
-//     FILE *query = fopen(argv[1], "r");
-//     FILE *template = fopen(argv[2], "r");
-//     DockRMSD val = dock_rmsd(query, template);
-//     printf("rmsd = %f\n", val.rmsd);
-//     printf("error = %s\n", val.error);
-//     printf("total_of_possible_mappings = %f\n", val.total_of_possible_mappings);
-//     if (strlen(val.optimal_mapping) > 0)
-//         printf("optimal_mapping = \n%s", val.optimal_mapping);
-//     free(val.optimal_mapping);
-//     return 0;
-// }
+int main(int argc, char const *argv[])
+{
+    FILE *query = fopen(argv[1], "r");
+    FILE *template = fopen(argv[2], "r");
+    DockRMSD val = dock_rmsd(query, template);
+    printf("rmsd = %f\n", val.rmsd);
+    printf("error = %s\n", val.error);
+    printf("total_of_possible_mappings = %f\n", val.total_of_possible_mappings);
+    if (strlen(val.optimal_mapping) > 0)
+        printf("optimal_mapping = \n%s", val.optimal_mapping);
+    free(val.optimal_mapping);
+    return 0;
+}

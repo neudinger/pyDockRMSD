@@ -1,7 +1,6 @@
 import os
 import cython
 from libc.stdio cimport *  # noqa: E999
-from libc.stdlib cimport free
 
 cdef extern from "stdio.h":
     # FILE * fopen ( const char * filename, const char * mode )

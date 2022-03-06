@@ -846,7 +846,6 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
         free(querybond[i]);
         free(tempbond[i]);
     }
-    rmsd.optimal_mapping = optimal_mapping;
     for (int i = 0; i < atomcount; i++)
         free(allcands[i]);
     free(candcounts);
@@ -861,6 +860,7 @@ DockRMSD assignAtoms(char **tempatom, char ***tempbond,
     free(tempbond);
     free(querynums);
     free(tempnums);
+    rmsd.optimal_mapping = optimal_mapping;
     return rmsd;
 }
 

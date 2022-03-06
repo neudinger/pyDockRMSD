@@ -126,6 +126,10 @@ print(hungarian("./data/targets/1a8i/crystal.mol2",
                 "./data/targets/1a8i/vina1.mol2"))
 ```
 
+## License
+
+This project is open source licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2 EUPL © the European Union 2007, 2016 License. Please see the [LICENSE file](LICENSE) for more information.
+
 ### Local documentation
 
 ```bash
@@ -139,3 +143,12 @@ Tag:
 - b: Build
 - p: Publish
 - t: Test
+
+
+## Issues
+
+Corresponding issues:
+
+- [x] [neudinger/pyDockRMSD#3](https://github.com/neudinger/pyDockRMSD/issues/3)
+
+[CHANGELOG file](CHANGELOG)

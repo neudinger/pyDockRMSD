@@ -54,12 +54,6 @@ jobs:
         with:
           release_id: ${{ needs.create_release.outputs.id }}
           assets_path: ./dist/
-      - name: Run Unit Test
-        if: ${{ contains(github.ref, 't') }}
-      - name: Generate Documentation
-        if: ${{ contains(github.ref, 'd') && matrix.os == 'ubuntu-20.04' }}
-        run: |
-          pip install pdoc3
       - name: Deploy to PyPI ${{ matrix.os }}
         if: ${{ contains(github.ref, 'p') && matrix.os != 'windows-2019'}}
         env:

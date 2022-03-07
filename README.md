@@ -4,7 +4,7 @@
 [![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
 [![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
 
-[![PyPI Download](https://img.shields.io/pypi/dm/pydockrmsd)](https://pypi.python.org/pypi/pydockrmsd/)
+[![PyPI Download](https://img.shields.io/pypi/dm/pydockrmsd)](https://pypistats.org/packages/pydockrmsd)
 [![PyPI implementation](https://img.shields.io/pypi/implementation/pydockrmsd.svg)](https://pypi.python.org/pypi/pydockrmsd/)
 
 ## Abstract
@@ -129,7 +129,7 @@ print(hungarian("./data/targets/1a8i/crystal.mol2",
 
 ## License
 
-This project is open source licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2 EUPL © the European Union 2007, 2016 License. Please see the [LICENSE file](LICENSE) for more information.
+This project is open source licensed under the EUROPEAN UNION PUBLIC LICENCE v. 1.2 EUPL © the European Union 2007, 2016 License. Please see the [LICENSE](LICENSE.md) for more information.
 
 ### Local documentation
 
@@ -152,4 +152,4 @@ Corresponding issues:
 
 - [x] [neudinger/pyDockRMSD#3](https://github.com/neudinger/pyDockRMSD/issues/3)
 
-[CHANGELOG file](CHANGELOG)
+[CHANGELOG](CHANGELOG.md)

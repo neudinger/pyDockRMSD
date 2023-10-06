@@ -1,9 +1,5 @@
 # DockRMSD
 
-[![Linux](https://svgshare.com/i/Zhy.svg)](https://svgshare.com/i/Zhy.svg)
-[![macOS](https://svgshare.com/i/ZjP.svg)](https://svgshare.com/i/ZjP.svg)
-[![Windows](https://svgshare.com/i/ZhY.svg)](https://svgshare.com/i/ZhY.svg)
-
 [![PyPI Download](https://img.shields.io/pypi/dm/pydockrmsd)](https://pypistats.org/packages/pydockrmsd)
 [![PyPI implementation](https://img.shields.io/pypi/implementation/pydockrmsd.svg)](https://pypi.python.org/pypi/pydockrmsd/)
 
